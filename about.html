@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta name='author' content='Igor Sapijaszko'>
+  <meta name='description' content='!!!!!!WRITE DESCRIPTION!!!!!!'>
+  <link rel='stylesheet' href='style.css'>
+  <html lang='en-US'>
+  <title>About</title>
+</head>
+<body>
+  <nav>
+    <a class="nav-btn nav-btn-1 nav-btn-hover" href="index.html">Steam Games Graph</a>
+    <a class="nav-btn nav-btn-2 nav-btn-hover" href="graph-tree.html">Steam Games Tree</a>
+    <a class="nav-btn nav-btn-current">What's this?</a>
+  </nav>
+<main class="main-content">
+  <article>
+    <h1><span class="highlight-span">What’s this?</span></h1>
+    <p>You're looking at an attempt to visualize co-occurrence and adjacency of games on Valve’s <a href="https://store.steampowered.com/" title="Steam">Steam</a> platform.</p>
+    <p><em>But what does it mean?</em></p>
+    <p>Imagine a game, suppose, <a href="https://store.steampowered.com/app/8930/Sid_Meiers_Civilization_V/" title="Civilization V">Civilization V</a>. There are other games, more or less similar to Civ V: <a href="https://store.steampowered.com/search/?term=strategy&developer=Paradox%20Development%20Studio" title="Paradox Studio Games">Paradox’ strategy games</a>, <a href="https://store.steampowered.com/app/289130/Endless_Legend/" title="Endless Legends">Endless Legends</a> or <a href="https://store.steampowered.com/app/392110/Endless_Space_2/" title="Endless Space 2">Endless Space</a>, <a href="https://store.steampowered.com/search/?term=Civilization" title="'Civilization' games">other Civ installments</a>. It’s safe to assume that Civ players should also like these similar games, and therefore, should also have them in their libraries. Following that logic, players of strategy games should tend to have other strategy games in their libraries more often, than, let’s say, driving games. In other words, similar games should be co-occurrent. Presence of one in given user’s library should correlate with the presence of similar games.</p>
+    <p>Co-occurrence can be measured. This measurement can then be used to find any game’s neighbors - that is, most correlated games.</p>
+    <p>You can see the results in the form of graphs displayed on the site. They show a snapshot of Steam’s games universe, taken late October 2017, based on data gathered from ~500k user profiles. Sadly, like many data visualization projects, it doesn’t show the whole picture. For sake of clarity, I’ve had to trim the number of games to 5.000 most popular games, and number of connections to a maximum of 3 for each game.</p>
+    <div class="img-box">
+      <img src="img/map_01.png" width="800">
+      <p class="img-desc">Graph, abridged.</p>
+    </div>
+    <h2><span class="dotted-span">Why?</span></h2>
+    <p>I was curious. :) I don’t think I’ve seen any similar attempts made elsewhere. Also, it was a neat way to learn new skills.</p>
+    <h2><span class="dotted-span">What’s next?</span></h2>
+    <p>This website was meant to be an on-going project, but, sadly, that’s no longer possible. Recently, <a href="https://steamcommunity.com/games/593110/announcements/detail/1667896941884942467" title="Steam Blog: New Profile Privacy Settings">Valve has changed the default visibility of users’ profiles</a> from public to private, which means that users have to give their explicit permission before their libraries can be accessed. At this moment, there are too few users who allow accessing their libraries, which means gathering new, updated data is difficult. <a href="https://galyonk.in/whats-going-on-with-steam-spy-deed5d699233" title="Sergey Galyonkin: What’s going on with Steam Spy?">SteamSpy has side-stepped this issue</a>, maybe I'll find a way to do that as well.</p>
+    <p>Graphs are presented for informative purposes only. I'm not affiliated with Valve.</p>
+
+    <h1><span class="highlight-span">Methodology</span></h1>
+    <p>To gather and manipulate data, I’ve used a suite of Python-based tools: Python scripts for API queries and utils, and a lot of <a href="https://www.anaconda.com/download/" title="Anaconda Distribution">Jupyter notebooks</a> for data exploration and ad-hoc transformation.</p>
+    <p>Graphs are displayed using the <a href="http://sigmajs.org/" title="sigma.js">sigma.js</a> library. I’ve also used <a href="https://gephi.org/" title="Gephi">Gephi</a> to build visualizations.</p>
+    <h2><span class="dotted-span">Gathering data</span></h2>
+    <h3><span class="border-span">User data</span></h3>
+    <p>It is (or rather: it was) easy to obtain data from Steam’s user libraries. There’s a simple API call which, given correct user ID and <a href="https://steamcommunity.com/dev/apikey" title="Steam API key">API key</a>, will return a neatly formatted JSON with games in user’s library and time spent on each game.</p>
+<p><pre>http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=&lt;insert your key here&gt;&steamid=&lt;insert user id here&gt;&format=json</pre></p>
+    <p>Example response:</p>
+      <p><pre><samp>{"response":{"game_count":308,"games":[{"appid":220,"playtime_forever":70},{"appid":320,"playtime_forever":0},{"appid":340,"playtime_forever":0},{"appid":360,"playtime_forever":0},...</p></pre></samp>
+
+    <p>JSON responses are simple but heavy to store. I’ve stripped each response off unnecessary data (I needed only game IDs), encoded them, and stored them all in one JSON file that held just a list of 3-value dictionaries: user ID, date of last access, and encoded game string.</p>
+    <p>My <span class="code">data.json</span> file looked like this:</p>
+    <p><pre><samp>  ...
+{"p": "...", "d": "1710261926", "g": "1js2OBPr4OId5J-7DlRJAvEQVc~r2LCwiNWWENZcwZN~bmivwfQ2sV9TSqejmR8UcN8LM~1D3Pvw.wvEegEI~EB-DxssX"},
+{"p": "...", "d": "1710261926", "g": "error"},
+{"p": "...", "d": "1710261926", "g": "hsJbyx8owrY7ELPWCOBrQHkgwv4GiKt-Zs4ZQLiYsOWBdlL_nv4h0euf4mdTdrgwFzdYc51UvAdLtL8Hebq.uyjI4~.GzWz9XvArCC9I.~QRXoXc31z0brd-z3Fd.cIYkB"},
+  ...</samp></pre></p>
+    <p>That way, a file containing data of more than 500.000 users weighted slightly more than 250 MB. If I were continue with the project, I’d have to find a better solution, but a single file with all gathered data worked just fine.</p>
+    <p>Gathering a pool of usable user IDs in the first place was slightly harder. To do so, I’ve gathered data from a Steam Group (<a href="https://steamcommunity.com/groups/familysharing#members" title="Steam Family Sharing group">this one</a>, to be exact). Each group member has a link to their profile - and it’s just a matter of collecting those profile names into two buckets - one for numerical IDs, and one for custom nicknames.</p>
+    <h3><span class="border-span">Games data</span></h3>
+    <p>To gather most basic data (game name), it’s enough to use just an API request:</p>
+    <p><pre>https://api.steampowered.com/IStoreService/GetAppList/v1/?key=&lt;your key here&gt;.</pre></p>
+    <p>At some point, I’ve wanted to get hold of more complex data: developer name, publisher name, tags, etc. I’d used an API request that’s defunct now, and I don’t know if there’s an alternative other than scraping data from Steam store itself.</p>
+    <h2><span class="dotted-span">Making sense of it all</span></h2>
+    <p>At this point, all we have is a long list of user libraries: arrays like <span class="code">[80, 400, 1020, ...]</span>, with each value corresponding to ID of some game.</p>
+    <p>Each game can be treated as a dimension, with user’s position in that dimension being either <span class="code">1</span>, if they own the game, or <span class="code">0</span> if they don’t. In other words, each user can be thought of as a point in n-dimensional game-space, where n is the total number of different games there exists. Games can be considered the same way: if each user was to be considered a dimension, each game can be thought of as a point in m-dimensional user-space, where m is the total number of users I’ve gathered data of.</p>
+    <p>Now, with each game considered a point in multi-dimensional space, we can use any applicable metric to measure the distance between each pair of games. Games that are near each other are considered highly correlated, or neighbors.</p>
+    <p>Before measuring adjacency, I’ve had to select a smaller amount of users to make my user-space for games points. There are three main reasons to do so:</p>
+    <ol>
+    <li>Memory optimization: given a task of building a 10k x 10k adjacency matrix from 20k-dimensional vectors my PC works just fine but runs out of memory quickly when doing the same based on 500k-dimensional vectors,</li>
+    <li><a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality">Distance metrics and nearest neighbor computing techniques work best for low-dimensional spaces</a> (not that 20k-dimensional space is THAT low-dimensional)</li>
+    <li>Redundancy: I don’t really need entries from players who have only one game in their library, or those who own five hundred different games. There’s not much information to be taken from these.</li>
+  </ol>
+    <p>To trim the number of ‘meaningful’ users, I’ve:</p>
+    <ol>
+      <li>Discarded games with less than ~100 players (which results in ~10k games),</li>
+      <li>Gathered some minimum amount of players (again, about 100) for each game, each player was considered most optimal if they had about 40 games in their libraries,</li>
+      <li>For each game, I’ve checked if I have a 100 owners from players I’d already gathered. If not, I’ve found new owners and added them to the pool.</li>
+      <li>These threshold or optimal values I’ve used are not based on any thorough testing, they just… kinda worked.</li>
+  </ol>
+    <p>This resulted in about 12k games and 20k users.</p>
+
+    <p>Having built a users-games matrix, creating games-games distance matrix can be done by a single function: <span class="code">sklearn.metrics.pairwise(matrix, metric=’cosine’)</span>. Calculating an adjacency matrix is just a matter of subtracting distance matrix from <span class="code">np.ones()</span> matrix.</p>
+    <p>In order to not end up with a graph that has 12k * 12k = 144M edges, all connections with adjacency lower than mean + 3 * standard deviation (calculated per game, not per matrix) were discarded. This, fed directly into Python’s NetworkX library, resulted in a graph with ~12k nodes and ~240k edges.</p>
+    <h2><span class="dotted-span">Visualization medium</span></h2>
+    <p>I’ve tried various approaches to displaying the data:</p>
+    <h3>3D visualization, based on <a href="https://unity3d.com/" title="Unity">Unity</a></h3>
+    <p>Unity is a game engine I’m comfortable with. It means that I could easily add cool features (search, dynamic 2D overlay on top of a 3D scene). Unity, however, has limited web compatibility. The app I’ve built wasn’t even that heavy (8MB), but it didn’t work correctly in Chrome.</p>
+    <div class="img-box">
+      <img src="img/unity_01.png" width="400" height="240"><img src="img/unity_02.png" width="400" height="240">
+      <p class="img-desc">3D graphs in Unity. Left: web player; Right: standalone version.</p>
+    </div>
+    <h3>3D visualization, based on <a href="https://www.babylonjs.com/" title="babylon.js">babylon.js</a></h3>
+    <p>It worked fine… until I’ve wanted to display a multitude of labels, or worse, hide or show labels based on distance from the camera. I don’t think I’ve even got around to displaying edges. I’m sure these obstacles can be overcome, but eventually, I got overwhelmed and took a break from the project.</p>
+    <div class="img-box">
+      <iframe src="https://giphy.com/embed/l4FGzWrCSvaAykyLm" width="400" height="240" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+      <img src="img/babylonjs_03.png" width="400" height="240">
+      <p class="img-desc">3D graphs rendered with babylon.js.</p>
+    </div>
+    <h3>2D visualization, based on sigma.js</h3>
+    <p>I’ve settled on a simple, 2D, in-browser visualization. It’s not flashy, but it’s enough.</p>
+    <h2><span class="dotted-span">Visualization method</span></h2>
+    <p>Final results you see on the website are using two methods of graph visualization.</p>
+    <h3>Steam Games Graph - Gephi’s ForceAtlas2 algorithm</h3>
+    <p><a href="https://github.com/gephi/gephi/wiki/Force-Atlas-2" title="ForceAtlas2">ForceAtlas</a> is an algorithm that simulates attraction and repulsion forces between all nodes: nodes repulse one another, but edges between nodes hold them together. Main strength of this approach (other than visual clarity and attractiveness) is that this algorithm is iterative - even if after some time base data would have changed, the updated graph could use its previous version as its basis. This way, the updated graph would differ only slightly, which would be important in an on-going, continuously updating project.</p>
+    <p>To make result image more clear, I’ve further reduced the number of nodes and edges, to ~5.000 games and 3 neighbors per game.</p>
+    <p>Pitfalls of this type of visualization:</p>
+    <ul>
+      <li>These visualizations are two-dimensional. It means that they’re only a shallow representation of a nuanced structure.</li>
+      <li>There can be cases of two games displayed close to each other, despite having little similarity or actual co-occurrence. There's might not be enough space elsewhere for them.</li>
+      <li>There can also be cases of games displayed very far from each other, despite being fairly co-occurrent. For example, this can happen where there are two fairly distinct groups of games (let’s say, strategy games and racing games) relatively far from each other, and a game that’s for some reason highly correlated with games from both these groups. In most cases, it will sit awkwardly between these groups, seemingly out of place.</li>
+  </ul>
+    <p>Back when I tried to make the output 3D I’ve even written a <a href="https://github.com/Ankhee/ndim_forceatlas" title="NDimForceAtlas">small Python library</a> to calculate ForceAtlas for n-dimensions!</p>
+    <h3>Steam Games Tree - Graphviz’ SFDP algorithm</h3>
+    <p>To achieve the tree-like structure of the second graph, I’ve used <a href="https://www.graphviz.org/" title="Graphviz">Graphviz’</a> plugin to Gephi, with its SFDP algorithm. It’s not iterative, but given that I can’t really update my dataset anymore, it doesn’t really matter. ¯\_(ツ)_/¯</p>
+    <p>In order to prepare data for this type of presentation, I had to remove all loops from the graph. I've ordered all edges based on their weight, combined with weight (size) of nodes they connect, and cut one after another. If graph was no longer connected after the cut, I've created the connection again. </p>
+    <p>This graph favors strong connections between large games over weak connections between small games.</p>
+    <p>Unlike the previous graph, it was constructed from a pool of ~8.000 largest games.</p>
+    <h3>Other approaches</h3>
+    <p>I’ve tried using t-SNE and PCA, but the results were not very compelling (even if they were more accurate representations of n-dimensional space in 2 or 3 dimensions).</p>
+    <h2><span class="dotted-span">Colors</span></h2>
+    <p>Nodes’ colors are a result of simply embedding nodes into 3D space using t-SNE (based on high-dimensional adjacency matrix calculated earlier), and using 3D positions as RGB values. Which means that nodes colors are meaningful and let us understand actual adjacency more clearly.</p>
+    <p>Check <a href="https://github.com/kylemcdonald/Coloring-t-SNE" title="Kyle McDonald: Coloring t-SNE">Kyle McDonald's article</a> on coloring multi-dimensional data visualizations.</p>
+    <h1><span class="highlight-span">About me</span></h1>
+    <p>My name is Igor Sapijaszko, and I’m a Level Designer at <a href="http://techland.pl/" title="Techland">Techland</a>. I like games, computers, data-oriented stuff, design, and having fun projects to tinker with. I have MSc in Architecture, and I’m currently enrolled in a BSc course in Computer Science.</p>
+    <p>Questions? Feedback? You can reach me at igor.sapijaszko@gmail.com.</p>
+  </article>
+</main>
+<footer>
+  <p>Igor Sapijaszko, 2018.</p>
+</footer>
+</body>
+</html>

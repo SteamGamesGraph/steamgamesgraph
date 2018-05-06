@@ -1,0 +1,238 @@
+html {
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.35;
+}
+
+.main-content {
+  position: relative;
+}
+
+body {
+  height: 100%
+}
+
+body.hidden-overflow {
+  /* overflow: hidden; */
+}
+
+footer {
+  font-family: monospace;
+  font-size: smaller;
+  color: gray;
+  right: 50%;
+  height: 8em;
+  margin-top: 4em;
+  left: 50%;
+  width: 200px;
+  transform: translate(-100px, 0);
+  position: relative;
+  text-align: center;
+}
+
+.fixed-footer {
+  position:fixed;
+  bottom:0;
+}
+
+
+nav {
+  position:relative;
+  display:block;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: .5em;
+  overflow: visible;
+  font-size: large;
+}
+
+article {
+  /* position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0); */
+  position:relative;
+  display:block;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 1em;
+}
+
+.highlight-span {
+  padding: 0.25em 0.5em 0.25em 48px;
+  /* border: thick solid black;
+  border-width: 0 0 thick 0;*/
+  background-color: black;
+  color: white;
+
+}
+
+.border-span {
+  /* background: pink; */
+  padding: 0.25em 0.5em 0.25em 48px;
+  position:relative;
+  /* background-blend-mode: overlay; */
+}
+
+/* .border-span::before {
+  content: " ";
+   position: absolute;
+   z-index: -1;
+   height: 1em;
+   top: 1em;
+   left: 0;
+   right: 0;
+   background: pink;
+} */
+
+.dotted-span {
+  padding: 0.25em 0.5em 0.25em 48px;
+  position:relative;
+}
+
+.dotted-span::before {
+  content: " ";
+   position: absolute;
+   z-index: -1;
+   height: 1em;
+   top: 1em;
+   left: 0;
+   right: 0;
+   background-color: white;
+   background-image: url("img/dotted_bg.png");
+   /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGUlEQVQ4y2NgoBJwoJAedcGoC0ZdMOAuAABF0hABJ/8lyQAAAABJRU5ErkJggg==); */
+   background-attachment: scroll;
+}
+
+h1, h2, h3, h4, h5, h6, nav {
+  font-family: 'Source Code Pro', monospace;
+  font-weight: 900;
+}
+
+h1 {
+  margin-top: 2em;
+}
+
+h2 {
+  margin-top: 1.5em;
+}
+
+h4 {
+  padding-left: 48px;
+  color:#001a1a;
+}
+
+a {
+  text-decoration: none;
+  border: thick solid #00e6e6; /* #ACEAFD;*/
+  background: #e6ffff;
+  border-width: 0 medium medium 0;
+  background-blend-mode: multiply;
+  padding: -1px;
+  padding-left: .2em;
+  padding-right: .2em;
+}
+
+a:hover{
+  background: #00e6e6;
+  color: white !important;
+}
+
+a:visited{
+  color: inherit;
+}
+
+a:link {
+  color: inherit;
+}
+
+pre {
+  max-width: 800px;
+  overflow: auto;
+
+}
+
+pre, .code {
+  background: whitesmoke;
+  font-family: monospace;
+  maring: 1px;
+  font-size: larger;
+}
+
+
+
+a.nav-btn {
+  position: relative;
+  width: 235px;
+  display: inline-block;
+  padding: 0.5em 0 0.5em 1em;
+}
+
+a.nav-btn-hover:hover {
+  background: #00e6e6 !important;
+}
+
+a.nav-btn-1 {
+  background: linear-gradient(to right, #ffe5cb , #ffd2d4);
+}
+
+a.nav-btn-2 {
+  background: linear-gradient(to right, #ffd2d4 , #fdc7e4);
+}
+
+a.nav-btn-3 {
+  background: linear-gradient(to right, #fdc7e4 , #eeb5f8);
+}
+
+a.nav-btn-current {
+  background-color: black;
+  color: white;
+  border: thick solid black;
+  border-width: 0 medium medium 0;
+}
+
+a.nav-btn-current::before {
+  content: " ";
+   position: absolute;
+   z-index: -1;
+   bottom: 0.25em;
+   top: -0.25em;
+   left: -0.25em;
+   right: 0.25em;
+   background-color: whitesmoke;
+   background-image: url("img/dotted_bg.png");
+   /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGUlEQVQ4y2NgoBJwoJAedcGoC0ZdMOAuAABF0hABJ/8lyQAAAABJRU5ErkJggg==); */
+   background-attachment: scroll;
+}
+
+.img-box {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  width: auto;
+  word-wrap: break-word;
+  background:whitesmoke;
+}
+
+img, iframe {
+  margin: 0 auto;
+  object-fit: cover;
+  outline: 5px solid whitesmoke;
+  outline-offset: -5px
+}
+
+.img-desc {
+  font-size: smaller;
+  text-align: right;
+  width: 100%;
+  font-family: monospace;
+  background:whitesmoke;
+  color:black;
+  padding-right: 1em;
+}
+
+#container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+}
