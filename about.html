@@ -3,8 +3,11 @@
 <head>
   <meta charset='utf-8'>
   <meta name='author' content='Igor Sapijaszko'>
-  <meta name='description' content='!!!!!!WRITE DESCRIPTION!!!!!!'>
+  <meta name='description' content='Steam Games Graph - adjacency between Steam games, visualized.'>
   <link rel='stylesheet' href='style.css'>
+  <link rel="icon"
+      type="image/png"
+      href="img/icon.png">
   <html lang='en-US'>
   <title>About</title>
 </head>
@@ -13,6 +16,7 @@
     <a class="nav-btn nav-btn-1 nav-btn-hover" href="index.html">Steam Games Graph</a>
     <a class="nav-btn nav-btn-2 nav-btn-hover" href="graph-tree.html">Steam Games Tree</a>
     <a class="nav-btn nav-btn-current">What's this?</a>
+    <a class="nav-btn nav-btn-4 nav-btn-hover" href="contact.html">Contact</a>
   </nav>
 <main class="main-content">
   <article>
@@ -27,14 +31,14 @@
       <p class="img-desc">Graph, abridged.</p>
     </div>
     <h2><span class="dotted-span">Why?</span></h2>
-    <p>I was curious. :) I don’t think I’ve seen any similar attempts made elsewhere. Also, it was a neat way to learn new skills.</p>
+    <p>I was curious. :) I don’t think I’ve seen any similar attempts made elsewhere.</p>
     <h2><span class="dotted-span">What’s next?</span></h2>
     <p>This website was meant to be an on-going project, but, sadly, that’s no longer possible. Recently, <a href="https://steamcommunity.com/games/593110/announcements/detail/1667896941884942467" title="Steam Blog: New Profile Privacy Settings">Valve has changed the default visibility of users’ profiles</a> from public to private, which means that users have to give their explicit permission before their libraries can be accessed. At this moment, there are too few users who allow accessing their libraries, which means gathering new, updated data is difficult. <a href="https://galyonk.in/whats-going-on-with-steam-spy-deed5d699233" title="Sergey Galyonkin: What’s going on with Steam Spy?">SteamSpy has side-stepped this issue</a>, maybe I'll find a way to do that as well.</p>
     <p>Graphs are presented for informative purposes only. I'm not affiliated with Valve.</p>
 
     <h1><span class="highlight-span">Methodology</span></h1>
     <p>To gather and manipulate data, I’ve used a suite of Python-based tools: Python scripts for API queries and utils, and a lot of <a href="https://www.anaconda.com/download/" title="Anaconda Distribution">Jupyter notebooks</a> for data exploration and ad-hoc transformation.</p>
-    <p>Graphs are displayed using the <a href="http://sigmajs.org/" title="sigma.js">sigma.js</a> library. I’ve also used <a href="https://gephi.org/" title="Gephi">Gephi</a> to build visualizations.</p>
+    <p>Graphs are displayed using the <a href="http://sigmajs.org/" title="sigma.js">sigma.js</a> library. Search is performed using the <a href="http://fusejs.io/" title="Fuse.js">fuse.js</a> library. I’ve also used <a href="https://gephi.org/" title="Gephi">Gephi</a> to build visualizations.</p>
     <h2><span class="dotted-span">Gathering data</span></h2>
     <h3><span class="border-span">User data</span></h3>
     <p>It is (or rather: it was) easy to obtain data from Steam’s user libraries. There’s a simple API call which, given correct user ID and <a href="https://steamcommunity.com/dev/apikey" title="Steam API key">API key</a>, will return a neatly formatted JSON with games in user’s library and time spent on each game.</p>
@@ -111,13 +115,14 @@
     <p>This graph favors strong connections between large games over weak connections between small games.</p>
     <p>Unlike the previous graph, it was constructed from a pool of ~8.000 largest games.</p>
     <h3>Other approaches</h3>
-    <p>I’ve tried using t-SNE and PCA, but the results were not very compelling (even if they were more accurate representations of n-dimensional space in 2 or 3 dimensions).</p>
+    <p>I’ve tried using <a href="https://lvdmaaten.github.io/tsne/" title="Laurens van der Maaten: t-SNE">t-SNE</a> and PCA, but the results were not visually compelling, even if they were more accurate representations of n-dimensional space in 2 or 3 dimensions.</p>
+    <div class="img-box">
+      <img src="img/tsne.png" width="800" height="480">
+      <p class="img-desc">Graph embedded with t-SNE (5k nodes, max 3 connections per node).</p>
+    </div>
     <h2><span class="dotted-span">Colors</span></h2>
     <p>Nodes’ colors are a result of simply embedding nodes into 3D space using t-SNE (based on high-dimensional adjacency matrix calculated earlier), and using 3D positions as RGB values. Which means that nodes colors are meaningful and let us understand actual adjacency more clearly.</p>
     <p>Check <a href="https://github.com/kylemcdonald/Coloring-t-SNE" title="Kyle McDonald: Coloring t-SNE">Kyle McDonald's article</a> on coloring multi-dimensional data visualizations.</p>
-    <h1><span class="highlight-span">About me</span></h1>
-    <p>My name is Igor Sapijaszko, and I’m a Level Designer at <a href="http://techland.pl/" title="Techland">Techland</a>. I like games, computers, data-oriented stuff, design, and having fun projects to tinker with. I have MSc in Architecture, and I’m currently enrolled in a BSc course in Computer Science.</p>
-    <p>Questions? Feedback? You can reach me at igor.sapijaszko@gmail.com.</p>
   </article>
 </main>
 <footer>

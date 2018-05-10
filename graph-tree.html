@@ -1,18 +1,68 @@
 <html>
 <head>
+  <meta charset='utf-8'>
+  <meta name='author' content='Igor Sapijaszko'>
+  <meta name='description' content='Steam Games Graph - adjacency between Steam games, visualized.'>
   <link rel='stylesheet' href='style.css'>
+  <html lang='en-US'>
+  <link rel="icon"
+      type="image/png"
+      href="img/icon.png">
+  <title>Steam Games Tree</title>
 </head>
 <body class="hidden-overflow">
   <nav>
-    <a class="nav-btn nav-btn-1 nav-btn-hover" href="index.html">Steam Games Graph</a>
-    <a class="nav-btn nav-btn-current">Steam Games Tree</a>
-    <a class="nav-btn nav-btn-2 nav-btn-hover" href="about.html">What's this?</a>
+    <div>
+      <a class="nav-btn nav-btn-1 nav-btn-hover"  href="index.html">Steam Games Graph</a>
+      <a class="nav-btn nav-btn-current">Steam Games Tree</a>
+      <a class="nav-btn nav-btn-3 nav-btn-hover" href="about.html">What's this?</a>
+      <a class="nav-btn nav-btn-4 nav-btn-hover" href="contact.html">Contact</a>
+    </div>
+    <div class="nav-search">
+      <input type="text" name="gameLabel" id="game-search-input">
+      <button type="button" id="game-search-btn">Search</button>
+    </div>
+
   </nav>
   <main>
+    <script type="text/javascript">
+
+    var nodes_colors = new Map();
+    var edges_colors;
+    var neighbors_json;
+
+    fetch("data/neighbors.json")
+    .then(response => response.json())
+    .then(function(data){
+      neighbors_json = data;
+      // console.log(neighbors_json);
+    });
+
+    var labels_json;
+
+    fetch("data/labels_from_graph.json")
+    .then(response => response.json())
+    .then(function(data){
+      labels_json = data;
+      // console.log(neighbors_json);
+    });
+
+
+    </script>
+    <div id="node-detail-data" class="node-detail-data-box">
+      <div><a id="node-detail-data-label-a" target="_blank"><span id="node-detail-data-label"></span></a></div>
+      <div><table id="node-detail-data-table">
+        <tr id="node-detail-data-table-header">
+          <th>Neighbor</th>
+          <th>Adjacency</th>
+        </tr>
+      </table></div>
+    </div>
     <div id="container"></div>
     <script src="js/sigma.min.js"></script>
     <script src="js/sigma.parsers.json.min.js"></script>
     <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/fuse.min.js"></script>
     <script>
 
     // Instantiate sigma:
@@ -26,32 +76,168 @@
 
       settings: {
         font: 'open sans',
-    	  labelThreshold: 11,
+        labelThreshold: 8,
         labelSize: 'proportional',
-    	  minNodeSize: 4,
-    	  maxNodeSize: 12,
-    	  scalingMode: "outside",
+        minNodeSize: 3,
+        maxNodeSize: 15,
+        scalingMode: "outside",
         autoRescale: true,
         autoResize: true,
 
         // Captors
         zoomMin: 0.01,
-        zoomMax: 1.5,
+        zoomMax: 2,
         zoomingRatio: 1.3
       }
     });
 
-       sigma.parsers.json('data-8k-noloops.json', s, function(s){
+    function getStoreLink(id){
+      return "https://store.steampowered.com/app/" + id + "/";
+    }
 
-    		console.log("parsed");
-
-        // s.bind('clickNode', function(node){
-        //   console.log("clickNode");
-        //   console.log(node);
-        // });
-
-    		s.refresh();
+    function restoreColors(){
+      s.graph.nodes().forEach(function(node){
+        node.color = nodes_colors.get(node.id);
       });
+
+      s.graph.edges().forEach(function(edge, index){
+        edge.color = edges_colors[index].color;
+      });
+    }
+
+    sigma.parsers.json('data/data-8k-noloops.json', s, function(s){
+
+      console.log("parsed");
+
+      s.bind('clickNode', function(node){
+
+        var node_detail_data = document.getElementById("node-detail-data");
+        var node_detail_data_label = document.getElementById("node-detail-data-label");
+        node_detail_data.style.display = "block";
+
+        var id = node.data.node.id;
+        var label = node.data.node.label;
+        if (node_detail_data_label.childNodes.length > 0){
+          node_detail_data_label.removeChild(node_detail_data_label.childNodes[0]);
+        }
+        var label_a = document.getElementById("node-detail-data-label-a");
+        var nbs = neighbors_json[id];
+        var table = document.getElementById("node-detail-data-table");
+
+        for (var i = table.rows.length - 1; i > 0; i--){
+          table.deleteRow(i);
+        }
+
+        nbs.forEach(function(item, index){
+          var row = table.insertRow(table.rows.length);
+          var cell0 = row.insertCell(0);
+          var cell1 = row.insertCell(1);
+          var cell0_a = document.createElement('a');
+          var cell0_text = document.createTextNode(labels_json[item[0]]);
+          var cell1_text = document.createTextNode(item[1]/1000);
+          cell0_a.appendChild(cell0_text);
+          cell0_a.href = getStoreLink(item[0]);
+          cell0_a.target = "_blank";
+          cell0.appendChild(cell0_a);
+          cell1.appendChild(cell1_text);
+        });
+
+        label_node = document.createTextNode(label);
+        label_a.href= getStoreLink(id);
+        node_detail_data_label.appendChild(label_node);
+
+        var neighbors_ids = new Array(nbs.length);
+        nbs.forEach(function(item, index){
+          neighbors_ids[index] = item[0];
+        });
+
+        s.graph.nodes().forEach(function(node){
+          if (node.id == id || neighbors_ids.includes(node.id)){
+            node.active = true;
+            node.color = nodes_colors.get(node.id);
+            // console.log(nodes_colors[node.id]);
+          } else {
+            node.color = 'rgb(225,225,225)';
+          }
+        });
+
+        s.graph.edges().forEach(function(edge, index){
+          edge.color = 'rgb(235,235,235)';
+        });
+
+        s.refresh();
+      });
+
+      s.bind('clickStage', function(){
+        var node_detail_data = document.getElementById("node-detail-data");
+        node_detail_data.style.display = "none";
+
+        restoreColors();
+
+        s.refresh();
+      });
+
+      s.refresh();
+
+      s.graph.nodes().forEach(function(node){
+        nodes_colors.set(node.id, node.color);
+      });
+
+      edges_colors = JSON.parse(JSON.stringify(s.graph.edges()));
+    });
+
+    function startSearch () {
+      var text = document.getElementById("game-search-input").value;
+      var options = {
+        shouldSort: true,
+        threshold: 0.5,
+        location: 0,
+        distance: 100,
+        maxPatternLength: 32,
+        minMatchCharLength: 1,
+        keys: [
+          "label"
+        ]
+      };
+      var fuse = new Fuse(s.graph.nodes(), options); // "list" is the item array
+      var result = fuse.search(text);
+      if (result.length > 0){
+
+        var node_detail_data = document.getElementById("node-detail-data");
+        node_detail_data.style.display = "none";
+
+        var camera = s.cameras[0];
+        var match = result[0];
+        // console.log(match);
+        camera.x = match['read_cam0:x'];
+        camera.y = match['read_cam0:y'] + 5;
+        camera.ratio = 0.075;
+
+        camera.dispatchEvent('clickNode', {node: s.graph.nodes(match.id)});
+
+        s.graph.nodes().forEach(function(node){
+          if (node.id == match.id){
+            node.color = nodes_colors.get(node.id);
+          } else {
+            node.color = 'rgb(225,225,225)';
+          }
+        });
+
+        s.graph.edges().forEach(function(edge, index){
+          edge.color = 'rgb(235,235,235)';
+        });
+
+        s.refresh();
+      }
+    };
+
+    document.getElementById("game-search-btn").onclick = startSearch;
+    document.getElementById("game-search-input").addEventListener("keyup", function(event){
+      event.preventDefault();
+      if (event.keyCode === 13){
+        startSearch();
+      }
+    })
 
     </script>
   </main>
