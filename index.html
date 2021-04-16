@@ -186,8 +186,40 @@
       edges_colors = JSON.parse(JSON.stringify(s.graph.edges()));
     });
 
+    function onNodeFound (match) {
+
+      var node_detail_data = document.getElementById("node-detail-data");
+      node_detail_data.style.display = "none";
+
+      var camera = s.cameras[0];
+
+      camera.x = match['read_cam0:x'];
+      camera.y = match['read_cam0:y'] + 5;
+      camera.ratio = 0.075;
+
+      camera.dispatchEvent('clickNode', {node: s.graph.nodes(match.id)});
+
+      s.graph.nodes().forEach(function(node){
+        if (node.id == match.id){
+          node.color = nodes_colors.get(node.id);
+        } else {
+          node.color = 'rgb(225,225,225)';
+        }
+      });
+
+      s.graph.edges().forEach(function(edge, index){
+        edge.color = 'rgb(235,235,235)';
+      });
+
+      s.refresh();
+    }
+
     function startSearch () {
-      var text = document.getElementById("game-search-input").value;
+
+      var search_bar = document.getElementById("game-search-input")
+      var text = search_bar.value;
+
+      // fuzzy Search
       var options = {
         shouldSort: true,
         threshold: 0.5,
@@ -202,32 +234,11 @@
       var fuse = new Fuse(s.graph.nodes(), options); // "list" is the item array
       var result = fuse.search(text);
       if (result.length > 0){
-
-        var node_detail_data = document.getElementById("node-detail-data");
-        node_detail_data.style.display = "none";
-
-        var camera = s.cameras[0];
-        var match = result[0];
-        // console.log(match);
-        camera.x = match['read_cam0:x'];
-        camera.y = match['read_cam0:y'] + 5;
-        camera.ratio = 0.075;
-
-        camera.dispatchEvent('clickNode', {node: s.graph.nodes(match.id)});
-
-        s.graph.nodes().forEach(function(node){
-          if (node.id == match.id){
-            node.color = nodes_colors.get(node.id);
-          } else {
-            node.color = 'rgb(225,225,225)';
-          }
-        });
-
-        s.graph.edges().forEach(function(edge, index){
-          edge.color = 'rgb(235,235,235)';
-        });
-
-        s.refresh();
+        var match = result[0]
+        onNodeFound(match);
+        if (match.label.toLowerCase() !== text.toLowerCase()) {
+          search_bar.value = `${text} not found. Did you mean: ${match.label}?`
+        }
       }
     };
 
